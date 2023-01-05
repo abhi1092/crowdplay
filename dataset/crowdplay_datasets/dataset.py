@@ -29,6 +29,8 @@ DEFAULT_AGENT_KEY = "game_0>player_0"
 # Local SQLite for storage
 Base = declarative_base()
 
+DATASET_BASE_DIRECTORY = Path(__file__).parent.parent
+
 
 @lru_cache(maxsize=16)
 def preprocess_obs_in_trajectory(
@@ -213,7 +215,7 @@ class UserModel(Base):
 
 def get_engine_and_session(dataset_id, create=False):
     # Local SQLite DB
-    engine = create_engine(f"sqlite:///{Path(__file__).parent.parent}/data/{dataset_id}/dataset.sqlite")
+    engine = create_engine(f"sqlite:///{DATASET_BASE_DIRECTORY}/data/{dataset_id}/dataset.sqlite")
     if create:
         Base.metadata.create_all(engine)
     Session = sessionmaker(
@@ -245,7 +247,7 @@ def get_trajectory_by_id(id):
 
 def get_data_dir():
     """Gets the path to the dataset trajectory files."""
-    return f"{Path(__file__).parent.parent}/data/"
+    return f"{DATASET_BASE_DIRECTORY}/data/"
 
 
 def get_trajectory_filename_by_id(id):
@@ -254,12 +256,12 @@ def get_trajectory_filename_by_id(id):
     # Extremely unlikely any two uuids will ever collide, so this is probably OK.
     # If we wanted to guard against this, we could use self._sa_instance_state.dict['_sa_instance_state'].session.bind.engine.url
     # to get the correct subdirectory with certainty.
-    for subdir in os.listdir(f"{Path(__file__).parent.parent}/data/"):
-        if os.path.isdir(f"{Path(__file__).parent.parent}/data/{subdir}"):
-            if os.path.isfile(f"{Path(__file__).parent.parent}/data/{subdir}/{id}.pickle"):
-                return f"{Path(__file__).parent.parent}/data/{subdir}/{id}.pickle"
-            elif os.path.isfile(f"{Path(__file__).parent.parent}/data/{subdir}/{id}.pickle.gz"):
-                return f"{Path(__file__).parent.parent}/data/{subdir}/{id}.pickle.gz"
-            elif os.path.isfile(f"{Path(__file__).parent.parent}/data/{subdir}/{id}.pickle.bz2"):
-                return f"{Path(__file__).parent.parent}/data/{subdir}/{id}.pickle.bz2"
+    for subdir in os.listdir(f"{DATASET_BASE_DIRECTORY}/data/"):
+        if os.path.isdir(f"{DATASET_BASE_DIRECTORY}/data/{subdir}"):
+            if os.path.isfile(f"{DATASET_BASE_DIRECTORY}/data/{subdir}/{id}.pickle"):
+                return f"{DATASET_BASE_DIRECTORY}/data/{subdir}/{id}.pickle"
+            elif os.path.isfile(f"{DATASET_BASE_DIRECTORY}/data/{subdir}/{id}.pickle.gz"):
+                return f"{DATASET_BASE_DIRECTORY}/data/{subdir}/{id}.pickle.gz"
+            elif os.path.isfile(f"{DATASET_BASE_DIRECTORY}/data/{subdir}/{id}.pickle.bz2"):
+                return f"{DATASET_BASE_DIRECTORY}/data/{subdir}/{id}.pickle.bz2"
     raise ValueError(f"Trajectory {id} not found.")
