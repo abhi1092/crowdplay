@@ -324,7 +324,12 @@ def run_algo(
         exit()
 
     scorers = {"environment": d3rlpy.metrics.evaluate_on_environment(FireResetEnv(env))}
-
+    import wandb
+    wandb.tensorboard.patch(root_logdir=f"{output_dir}")
+    wandb.init(project="usar", entity="improbableai_zwh",
+               name=f'CQl_baseline_test',
+               sync_tensorboard=True
+               )
     # start training
     algo.fit(
         train_episodes,
@@ -336,6 +341,7 @@ def run_algo(
         save_interval=100,
         scorers=scorers,
     )
+    wandb.finish()
 
 
 if __name__ == "__main__":
@@ -350,7 +356,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, default=123, help="The seed, default: 123")
     parser.add_argument("--task", type=str, default="space_invaders", help="The task, default: 'space_invaders'")
 
-    parser.add_argument("--gpu", type=bool, default=False, help="Use gpu, default: False")
+    parser.add_argument("--gpu", action='store_true', help="If specified GPU will be used")
 
     parser.add_argument(
         "--output_dir",
