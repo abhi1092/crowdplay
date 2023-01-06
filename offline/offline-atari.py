@@ -1,7 +1,7 @@
 import argparse
 import os
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
-
+from os.path import join
 import d3rlpy
 import gym
 import numpy as np
@@ -14,6 +14,7 @@ from crowdplay_datasets.dataset import (
 from crowdplay_datasets.deepmind import MaxAndSkipAndWarpAndScaleAndStackFrameBuffer
 from d3rlpy.envs import ChannelFirst
 from sklearn.model_selection import train_test_split
+from datetime import datetime
 
 
 class DeepmindEverystep(gym.Wrapper):
@@ -325,8 +326,9 @@ def run_algo(
 
     scorers = {"mean_episode_return": d3rlpy.metrics.evaluate_on_environment(FireResetEnv(env))}
     import wandb
-    wandb.tensorboard.patch(root_logdir=f"{output_dir}")
-    wandb.init(project="usar", entity="improbableai_zwh",
+    experiment_name = f"{task}_{algorithm}_{seed}" + datetime.now().strftime("%Y%m%d%H%M%S")
+    wandb.tensorboard.patch(root_logdir=join(f"{output_dir}", "runs", experiment_name))
+    wandb.init(project="crowdplay", entity="improbableai_zwh",
                name=f'CQl_baseline_test',
                sync_tensorboard=True
                )
@@ -335,10 +337,12 @@ def run_algo(
         train_episodes,
         eval_episodes=test_episodes,
         logdir=f"{output_dir}",
-        experiment_name=f"{task}_{algorithm}_{seed}",
+        experiment_name= experiment_name,
         n_steps=1000000,
+        tensorboard_dir=f"{output_dir}",
         n_steps_per_epoch=1000,
         save_interval=100,
+        with_timestamp=False,
         scorers=scorers,
     )
     wandb.finish()
