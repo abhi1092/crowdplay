@@ -323,7 +323,7 @@ def run_algo(
         print("The specified offline learning algorithm is not supported.")
         exit()
 
-    scorers = {"environment": d3rlpy.metrics.evaluate_on_environment(FireResetEnv(env))}
+    scorers = {"mean_episode_return": d3rlpy.metrics.evaluate_on_environment(FireResetEnv(env))}
     import wandb
     wandb.tensorboard.patch(root_logdir=f"{output_dir}")
     wandb.init(project="usar", entity="improbableai_zwh",
