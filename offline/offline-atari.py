@@ -329,7 +329,7 @@ def run_algo(
     experiment_name = f"{task}_{algorithm}_{seed}" + datetime.now().strftime("%Y%m%d%H%M%S")
     wandb.tensorboard.patch(root_logdir=join(f"{output_dir}", "runs", experiment_name))
     wandb.init(project="crowdplay", entity="improbableai_zwh",
-               name=f'CQl_baseline_test',
+               name=experiment_name,
                sync_tensorboard=True
                )
     # start training
