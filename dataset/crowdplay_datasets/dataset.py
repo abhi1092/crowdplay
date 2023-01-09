@@ -32,7 +32,7 @@ Base = declarative_base()
 DATASET_BASE_DIRECTORY = Path(__file__).parent.parent
 
 
-@lru_cache(maxsize=16)
+#@lru_cache(maxsize=16)
 def preprocess_obs_in_trajectory(
     trajectory,
     agent=DEFAULT_AGENT_KEY,
