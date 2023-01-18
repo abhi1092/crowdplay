@@ -13,6 +13,10 @@ from crowdplay_datasets.dataset import (
 )
 from crowdplay_datasets.deepmind import MaxAndSkipAndWarpAndScaleAndStackFrameBuffer
 from d3rlpy.envs import ChannelFirst
+from d3rlpy.metrics.scorer import td_error_scorer
+from d3rlpy.metrics.scorer import discounted_sum_of_advantage_scorer
+from d3rlpy.metrics.scorer import average_value_estimation_scorer
+from d3rlpy.metrics.scorer import evaluate_on_environment
 from sklearn.model_selection import train_test_split
 from datetime import datetime
 from d3rlpy_algos.rd_discrete_cql import RDDiscreteCQL
@@ -334,7 +338,6 @@ def run_algo(
             q_func_factory=args.q_func,
             scaler='pixel',
             use_gpu=args.gpu,
-
             discriminator_clip_ratio=args.discriminator_clip_ratio,
             discriminator_kl_penalty_coef=args.discriminator_kl_penalty_coef,
             discriminator_weight_temp=args.discriminator_weight_temp,
@@ -344,8 +347,6 @@ def run_algo(
         algo = None
         print("The specified offline learning algorithm is not supported.")
         exit()
-
-    scorers = {"mean_episode_return": d3rlpy.metrics.evaluate_on_environment(FireResetEnv(env))}
     experiment_name = f"{task}_{algorithm}_{seed}" + datetime.now().strftime("%Y%m%d%H%M%S")
     if args.track:
         import wandb
@@ -365,6 +366,12 @@ def run_algo(
             settings=wandb.Settings(start_method='fork')
                    )
 
+    scorers = {
+                  'td_error': td_error_scorer,
+                  'discounted_advantage': discounted_sum_of_advantage_scorer,
+                  'value_scale': average_value_estimation_scorer,
+                  'mean_episode_return': evaluate_on_environment(FireResetEnv(env), epsilon=0.05)
+              }
     # start training
     algo.fit(
         train_episodes,

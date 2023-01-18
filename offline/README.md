@@ -25,7 +25,7 @@ To run the program, change the following:
 
 ### RDCQL experiment
 ```shell
-PYTHONPATH=`pwd` python offline-atari.py --algo RDCQL --track --wandb_api_key 1c56954c3534056d7a0734857f6f991fd31925a3 --discriminator_kl_penalty_coef 1.0 --discriminator_clip_ratio 0.5 --discriminator_weight_temp 1.0 --discriminator_lr 1e-4 --gpu 0
-PYTHONPATH=`pwd` python offline-atari.py --algo RDCQL --track --wandb_api_key 1c56954c3534056d7a0734857f6f991fd31925a3 --discriminator_kl_penalty_coef 5.0 --discriminator_clip_ratio 2.5 --discriminator_weight_temp 0.5 --discriminator_lr 1e-4 --gpu 1
+PYTHONPATH=`pwd` python offline/offline-atari-rdcql.py --algo RDCQL --track --wandb_api_key 1c56954c3534056d7a0734857f6f991fd31925a3 --discriminator_kl_penalty_coef 1.0 --discriminator_clip_ratio 0.5 --discriminator_weight_temp 1.0 --discriminator_lr 1e-4 --gpu 0 --task=riverraid_left
+PYTHONPATH=`pwd` python offline/offline-atari-rdcql.py --algo RDCQL --track --wandb_api_key 1c56954c3534056d7a0734857f6f991fd31925a3 --discriminator_kl_penalty_coef 5.0 --discriminator_clip_ratio 2.5 --discriminator_weight_temp 0.5 --discriminator_lr 1e-4 --gpu 1
 
 ```
