@@ -31,7 +31,7 @@ Base = declarative_base()
 
 #DATASET_BASE_DIRECTORY = Path(__file__).parent.parent
 
-DATASET_BASE_DIRECTORY = "/ataridataskdir"
+DATASET_BASE_DIRECTORY = "/skunk-pod-storage-abhi-2eb-40ibm-2ecom-pvc"
 
 #@lru_cache(maxsize=16)
 def preprocess_obs_in_trajectory(
