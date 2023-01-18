@@ -322,7 +322,14 @@ def run_algo(
             n_frames=4, batch_size=256, target_update_interval=2500, scaler="pixel", use_gpu=gpu
         )
     elif algorithm == "RDCQL":
-        algo = RDDiscreteCQL(
+        baseclass = RDDiscreteCQL
+        alg_cls = baseclass
+        if args.track:
+            class WrappedAlgorithm(WandbLoggerWrapper, baseclass):
+                pass
+
+            alg_cls = WrappedAlgorithm
+        algo = alg_cls(
             n_frames=4,  # frame stacking
             q_func_factory=args.q_func,
             scaler='pixel',
@@ -339,13 +346,13 @@ def run_algo(
         exit()
 
     scorers = {"mean_episode_return": d3rlpy.metrics.evaluate_on_environment(FireResetEnv(env))}
+    experiment_name = f"{task}_{algorithm}_{seed}" + datetime.now().strftime("%Y%m%d%H%M%S")
     if args.track:
         import wandb
         if args.wandb_api_key:
             wandb.login(key=args.wandb_api_key)
         configs = {**vars(args)}
-        experiment_name = f"{task}_{algorithm}_{seed}" + datetime.now().strftime("%Y%m%d%H%M%S")
-        configs["logdir"] = os.path.join(args.logdir, experiment_name)
+        configs["logdir"] = os.path.join(output_dir, experiment_name)
 
         wandb.init(
             project="crowdplay",
@@ -357,6 +364,7 @@ def run_algo(
             save_code=True,
             settings=wandb.Settings(start_method='fork')
                    )
+
     # start training
     algo.fit(
         train_episodes,
@@ -370,7 +378,8 @@ def run_algo(
         with_timestamp=False,
         scorers=scorers,
     )
-    wandb.finish()
+    if args.track:
+        wandb.finish()
 
 
 if __name__ == "__main__":
