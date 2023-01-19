@@ -354,7 +354,8 @@ def run_algo(
             wandb.login(key=args.wandb_api_key)
         configs = {**vars(args)}
         configs["logdir"] = os.path.join(output_dir, experiment_name)
-
+        configs["task"] = task
+        configs["seed"] = seed
         wandb.init(
             project="crowdplay",
             entity="improbableai_zwh",
