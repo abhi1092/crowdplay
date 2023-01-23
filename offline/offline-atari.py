@@ -313,7 +313,7 @@ def run_algo(
         )
     elif algorithm == "CQL":
         algo = d3rlpy.algos.DiscreteCQL(
-            n_frames=4, q_func_factory="qr", batch_size=256, target_update_interval=2500, scaler="pixel", use_gpu=gpu
+            n_frames=4, scaler="pixel", use_gpu=gpu
         )
     elif algorithm == "SAC":
         algo = d3rlpy.algos.DiscreteSAC(
