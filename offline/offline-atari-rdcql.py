@@ -336,6 +336,7 @@ def run_algo(
         algo = alg_cls(
             n_frames=4,  # frame stacking
             q_func_factory=args.q_func,
+            learning_rate=args.lr,
             scaler='pixel',
             use_gpu=args.gpu,
             discriminator_clip_ratio=args.discriminator_clip_ratio,
@@ -353,6 +354,7 @@ def run_algo(
             alg_cls = WrappedAlgorithm
         algo = alg_cls(
             n_frames=4,  # frame stacking
+            learning_rate=args.lr,
             q_func_factory=args.q_func,
             scaler='pixel',
             use_gpu=args.gpu,
@@ -375,6 +377,7 @@ def run_algo(
         configs["logdir"] = os.path.join(output_dir, experiment_name)
         configs["task"] = task
         configs["seed"] = seed
+        configs["lr"] = args.lr
         wandb.init(
             project="crowdplay",
             entity="improbableai_zwh",
@@ -453,6 +456,7 @@ if __name__ == "__main__":
     parser.add_argument("--discriminator_lr", type=float, default=1e-4)
     parser.add_argument("--discriminator_kl_penalty_coef", type=float, default=0.01)
     parser.add_argument("--discriminator_flow_coef", type=float, default=1.0, help="Only for FCRDCQL")
+    parser.add_argument("--lr", type=float, default=6.25e-5, help="Lr")
 
     args, remaining_cli = parser.parse_known_args()
     run_algo(args.algorithm, args.seed, args.task, args.gpu, args.output_dir, args.convert_trajectory)
