@@ -19,7 +19,7 @@ from d3rlpy.metrics.scorer import average_value_estimation_scorer
 from d3rlpy.metrics.scorer import evaluate_on_environment
 from sklearn.model_selection import train_test_split
 from datetime import datetime
-from d3rlpy_algos.rd_discrete_cql import RDDiscreteCQL
+from d3rlpy_algos.rd_discrete_cql import RDDiscreteCQL, FlowConserveRDDiscreteCQL
 from d3rlpy_algos.wandb_logger import WandbLoggerWrapper
 
 
@@ -343,6 +343,25 @@ def run_algo(
             discriminator_weight_temp=args.discriminator_weight_temp,
             discriminator_lr=args.discriminator_lr,
         )
+    elif algorithm == "FCRDCQL":
+        baseclass = FlowConserveRDDiscreteCQL
+        alg_cls = baseclass
+        if args.track:
+            class WrappedAlgorithm(WandbLoggerWrapper, baseclass):
+                pass
+
+            alg_cls = WrappedAlgorithm
+        algo = alg_cls(
+            n_frames=4,  # frame stacking
+            q_func_factory=args.q_func,
+            scaler='pixel',
+            use_gpu=args.gpu,
+            discriminator_clip_ratio=args.discriminator_clip_ratio,
+            discriminator_kl_penalty_coef=args.discriminator_kl_penalty_coef,
+            discriminator_weight_temp=args.discriminator_weight_temp,
+            discriminator_lr=args.discriminator_lr,
+            discriminator_flow_coef=args.discriminator_flow_coef,
+        )
     else:
         algo = None
         print("The specified offline learning algorithm is not supported.")
@@ -396,7 +415,7 @@ if __name__ == "__main__":
         "--algorithm",
         type=str,
         default="BC",
-        choices=["BC", "BCQ", "CQL", "IQN", "DQN", "SAC", "RDCQL"],
+        choices=["BC", "BCQ", "CQL", "IQN", "DQN", "SAC", "RDCQL", "FCRDCQL"],
         help="The algorithm to run",
     )
     parser.add_argument("--seed", type=int, default=123, help="The seed, default: 123")
@@ -433,6 +452,7 @@ if __name__ == "__main__":
     parser.add_argument("--discriminator_weight_temp", type=float, default=1.0)
     parser.add_argument("--discriminator_lr", type=float, default=1e-4)
     parser.add_argument("--discriminator_kl_penalty_coef", type=float, default=0.01)
+    parser.add_argument("--discriminator_flow_coef", type=float, default=1.0, help="Only for FCRDCQL")
 
     args, remaining_cli = parser.parse_known_args()
     run_algo(args.algorithm, args.seed, args.task, args.gpu, args.output_dir, args.convert_trajectory)
