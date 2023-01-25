@@ -270,11 +270,10 @@ def run_algo(
     # prepare algorithm
     if algorithm == "BC":
         algo = d3rlpy.algos.DiscreteBC(
-            learning_rate=3e-05,
+            learning_rate=1e-3,
             n_frames=4,
             q_func_factory="mean",
-            batch_size=256,
-            target_update_interval=2500,
+            batch_size=100,
             scaler="pixel",
             use_gpu=gpu,
         )
